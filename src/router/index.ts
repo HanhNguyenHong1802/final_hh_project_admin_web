@@ -1,3 +1,4 @@
+import WelcomeView from "@/views/WelcomeView.vue";
 import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
 import HomeView from "../views/HomeView.vue";
 
@@ -18,6 +19,14 @@ const routes: Array<RouteRecordRaw> = [
     // which is lazy-loaded when the route is visited.
     component: () =>
       import(/* webpackChunkName: "about" */ "../views/AboutView.vue"),
+  },
+  {
+    path: "/welcome",
+    name: "welcome",
+    component: WelcomeView,
+    meta: {
+      requireAuth: true,
+    },
   },
 ];
 

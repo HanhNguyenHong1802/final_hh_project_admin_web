@@ -6,6 +6,7 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
+    "lint:markup": "vue-tsc --noEmit",
     "prepare": "husky install",
     "check-types": "tsc --pretty --noEmit",
     "check-format": "prettier --check .",
@@ -14,17 +15,24 @@
     "test-all": "npm run check-format && npm run check-lint && npm run check-types && npm run build"
   },
   "dependencies": {
-    "@fortawesome/fontawesome-svg-core": "^6.2.1",
+    "@fortawesome/fontawesome-svg-core": "^6.4.0",
     "@fortawesome/free-brands-svg-icons": "^6.2.1",
     "@fortawesome/free-regular-svg-icons": "^6.2.1",
-    "@fortawesome/free-solid-svg-icons": "^6.2.1",
-    "@fortawesome/vue-fontawesome": "^3.0.2",
+    "@fortawesome/free-solid-svg-icons": "^6.4.0",
+    "@fortawesome/vue-fontawesome": "^3.0.0-5",
+    "axios": "^1.4.0",
     "core-js": "^3.8.3",
+    "firebase": "^9.16.0",
+    "jquery": "^3.6.4",
+    "popper.js": "^1.16.1",
     "register-service-worker": "^1.7.2",
+    "vee-validate": "^4.9.1",
     "vue": "^3.2.13",
-    "vue-router": "^4.0.3",
-    "vuex": "^4.0.0",
-    "yarn": "^1.22.19"
+    "vue-router": "^4.2.0",
+    "vue-tsc": "^1.0.24",
+    "vuex": "^4.1.0",
+    "yarn": "^1.22.19",
+    "yup": "^1.1.1"
   },
   "devDependencies": {
     "@commitlint/cli": "^17.3.0",
@@ -39,26 +47,28 @@
     "@vue/cli-plugin-vuex": "~5.0.0",
     "@vue/cli-service": "~5.0.0",
     "@vue/eslint-config-typescript": "^9.1.0",
-    "autoprefixer": "^10.4.13",
+    "autoprefixer": "^10.4.14",
     "eslint": "^7.32.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-vue": "^8.0.3",
     "husky": "^8.0.2",
     "lint-staged": "^11.2.6",
-    "postcss": "^8.4.19",
+    "postcss": "^8.4.23",
     "prettier": "^2.4.1",
-    "tailwindcss": "^3.2.4",
+    "tailwindcss": "^3.3.2",
     "typescript": "~4.5.5"
   },
   "gitHooks": {
     "pre-commit": "lint-staged"
   },
   "lint-staged": {
-    "*.ts": [
+    "*.{ts,vue}": [
       "npm run lint",
       "npm run format",
-      "git add ."
-    ]
+      "git add .",
+      "eslint --fix"
+    ],
+    "*": "prettier -w -u"
   }
 }
