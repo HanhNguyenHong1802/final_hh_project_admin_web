@@ -26,7 +26,7 @@
             Sign up for an account
           </p>
           <div class="w-full mt-6 mr-0 mb-0 ml-0 relative space-y-8">
-            <Form @submit="handleRegister" :validation-schema="schema">
+            <Form @submit.prevent="onSubmit" :validation-schema="schema">
               <div class="relative">
                 <label
                   for="username"
@@ -55,7 +55,7 @@
               </div>
               <div class="relative">
                 <button
-                  :disabled="loading"
+                  :disabled="isSubmitting"
                   class="w-full inline-block pt-4 pr-5 pb-4 pl-5 text-xl font-medium text-center text-white bg-indigo-500 rounded-lg transition duration-200 hover:bg-indigo-600 ease"
                 >
                   <span v-show="loading"></span>
@@ -80,22 +80,55 @@
     </div>
   </div>
 </template>
-<script lang="ts">
-import { Form, Field, ErrorMessage } from "vee-validate";
-import * as yup from "yup";
-import { useStore } from "vuex";
-import { computed } from "vue";
-import { TUserRequest } from "@/services/auth/auth.type";
-import { useRouter } from "vue-router";
-import { loadingMixin } from "@/mixins/loading-mixin";
 
+<script lang="ts">
+import { loadingMixin } from "@/mixins/loading-mixin";
+import { ErrorMessage, Field, Form, useForm } from "vee-validate";
+import { computed } from "vue";
+import { useRouter } from "vue-router";
+import { useStore } from "vuex";
+import * as yup from "yup";
+import { TUserRequest } from "@/services/auth/auth.type";
 export default {
   name: "LoginPage",
   setup() {
     const store = useStore();
+    const router = useRouter();
     const loggedIn = computed(() => store.state.auth.status.loggedIn);
+    let message = "";
+    const { values, handleSubmit, isSubmitting } = useForm({
+      validationSchema: yup.object().shape({
+        username: yup.string().required("Username is required"),
+        password: yup.string().required("Password is required"),
+      }),
+    });
+
+    const onSubmit = async (values: any) => {
+      // Send stuff to the API
+      try {
+        await store.dispatch("auth/login", values);
+        router.push("/profile");
+      } catch (error: any) {
+        message =
+          (error.response &&
+            error.response.data &&
+            error.response.data.message) ||
+          error.message ||
+          error.toString();
+      }
+    };
+
+    const handleSubmitWrapper = async () => {
+      await handleSubmit(onSubmit)();
+    };
+
     return {
       loggedIn,
+      values,
+      message,
+      isSubmitting,
+      onSubmit,
+      handleSubmitWrapper,
     };
   },
   components: {
@@ -110,7 +143,6 @@ export default {
     });
     return {
       loading: false as boolean,
-      message: "",
       schema,
     };
   },
@@ -120,25 +152,5 @@ export default {
     }
   },
   mixins: [loadingMixin],
-  methods: {
-    async handleLogin(user: TUserRequest) {
-      const store = useStore();
-      const router = useRouter();
-
-      this.loading = true;
-      try {
-        await store.dispatch("auth/login", user);
-        router.push("/profile");
-      } catch (error: any) {
-        this.message =
-          (error.response &&
-            error.response.data &&
-            error.response.data.message) ||
-          error.message ||
-          error.toString();
-      }
-      this.loading = false;
-    },
-  },
 };
 </script>
